@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Organización - Benjamin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.0.0/tabler-icons.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js/minified/introjs.min.css">
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+<link rel="stylesheet" href="styles/calendar.css">
+<link rel="stylesheet" href="styles/week.css">
+<link rel="stylesheet" href="styles/pomodoro.css">
+<link rel="stylesheet" href="styles/stats.css">
+<link rel="stylesheet" href="styles/modals.css">
+<link rel="stylesheet" href="styles/vistas.css">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/intro.js/minified/intro.min.js"></script>
+<script src="https://apis.google.com/js/api.js"></script>
+<script src="https://accounts.google.com/gsi/client"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="logo">
+      <div class="logo-text">
+        <span class="path">Organización</span>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="auth-pill" id="auth-btn" type="button" onclick="handleAuthButton()">
+        <i class="ph ph-google-logo"></i>
+        <span id="auth-label">Entrar con Google</span>
+      </button>
+      <button class="icon-btn" id="btn-notify" title="Notificaciones">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+          <path d="M13.7 21a2 2 0 0 1-3.4 0"></path>
+        </svg>
+      </button>
+      <button class="icon-btn" id="btn-settings" title="Ajustes">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
+          <path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.04.04a2.1 2.1 0 0 1-2.97 2.97l-.04-.04a1.8 1.8 0 0 0-1.98-.36 1.8 1.8 0 0 0-1.09 1.65V21.3a2.1 2.1 0 0 1-4.2 0v-.06a1.8 1.8 0 0 0-1.09-1.65 1.8 1.8 0 0 0-1.98.36l-.04.04a2.1 2.1 0 0 1-2.97-2.97l.04-.04A1.8 1.8 0 0 0 3.8 15a1.8 1.8 0 0 0-1.65-1.09H2.1a2.1 2.1 0 0 1 0-4.2h.06A1.8 1.8 0 0 0 3.8 8.62a1.8 1.8 0 0 0-.36-1.98l-.04-.04A2.1 2.1 0 0 1 6.37 3.63l.04.04a1.8 1.8 0 0 0 1.98.36A1.8 1.8 0 0 0 9.48 2.38V2.3a2.1 2.1 0 0 1 4.2 0v.08a1.8 1.8 0 0 0 1.09 1.65 1.8 1.8 0 0 0 1.98-.36l.04-.04a2.1 2.1 0 0 1 2.97 2.97l-.04.04a1.8 1.8 0 0 0-.36 1.98 1.8 1.8 0 0 0 1.65 1.09h.09a2.1 2.1 0 0 1 0 4.2h-.09A1.8 1.8 0 0 0 19.4 15Z"></path>
+        </svg>
+        <span class="save-dot" id="save-dot"></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="view active" id="view-mes">
+    <div class="stats-grid" data-dnd-group="stats">
+      <div class="stat-card tasks draggable-card" data-stat-card="tasks">
+        <div class="stat-icon"><i class="ph ph-list-checks"></i></div>
+        <div class="stat-val" id="stat-tasks">0</div>
+        <div class="stat-label">Tareas</div>
+      </div>
+      <div class="stat-card done draggable-card" data-stat-card="done">
+        <div class="stat-icon"><i class="ph ph-check-circle"></i></div>
+        <div class="stat-val" id="stat-done">0</div>
+        <div class="stat-label">Hechas</div>
+        <div class="stat-progress" aria-hidden="true">
+          <div class="stat-progress-fill" id="task-progress-fill"></div>
+        </div>
+        <div class="stat-progress-note" id="task-progress-note">0% completado</div>
+      </div>
+      <div class="stat-card parciales draggable-card" data-stat-card="parciales">
+        <div class="stat-icon"><i class="ph ph-exam"></i></div>
+        <div class="stat-val" id="stat-parciales">0</div>
+        <div class="stat-label">Parciales</div>
+      </div>
+      <div class="stat-card streak draggable-card" data-stat-card="streak">
+        <div class="stat-icon"><i class="ph ph-fire"></i></div>
+        <div class="stat-val" id="stat-streak">0</div>
+        <div class="stat-label">Racha</div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">
+        <i class="ti ti-calendar-month"></i>
+        Calendario
+      </div>
+      <div class="month-nav">
+        <button class="nav-btn" id="prev-month" aria-label="Mes anterior"><i class="ph ph-caret-left"></i></button>
+        <div class="month-title" id="month-title">?</div>
+        <button class="nav-btn" id="next-month" aria-label="Mes siguiente"><i class="ph ph-caret-right"></i></button>
+      </div>
+    </div>
+
+    <div class="calendar draggable-card" data-dashboard-panel="calendar">
+      <div class="cal-grid" id="dow-row"></div>
+      <div class="cal-grid" id="calendar"></div>
+      <div class="legend">
+        <div class="legend-item"><span class="dot dot-parcial"></span> parcial</div>
+        <div class="legend-item"><span class="dot dot-task"></span> tarea</div>
+        <div class="legend-item"><span class="dot dot-done"></span> hecha</div>
+        <div class="legend-item"><span class="dot dot-event"></span> calendar</div>
+        <div class="legend-item"><span class="dot dot-event"></span> evento</div>
+      </div>
+    </div>
+
+    <div class="day-detail-panel" data-dashboard-panel="day-detail">
+      <div class="section-header">
+        <div class="section-title">
+          <i class="ph ph-calendar-blank"></i>
+          Eventos del día
+        </div>
+        <input type="date" class="date-input" id="day-detail-date" onchange="renderDayDetail()">
+      </div>
+      <div id="day-detail-list"></div>
+    </div>
+  </div>
+
+  <div class="view" id="view-semana">
+    <div class="week-header">
+      <button class="nav-btn" id="prev-week" aria-label="Semana anterior"><i class="ph ph-caret-left"></i></button>
+      <div class="week-range" id="week-range">?</div>
+      <button class="nav-btn" id="next-week" aria-label="Semana siguiente"><i class="ph ph-caret-right"></i></button>
+    </div>
+    <div id="week-view"></div>
+  </div>
+
+  <div class="view" id="view-parciales">
+    <div class="section-header">
+      <div class="section-title">
+        <i class="ti ti-flame"></i>
+        Próximos parciales
+      </div>
+    </div>
+    <div class="quick-add-panel">
+      <div class="quick-add-title"><i class="ti ti-calendar-plus"></i> Agregar parcial o entrega</div>
+      <div class="quick-add-grid">
+        <div class="field">
+          <label for="parcial-mat-input">Materia</label>
+          <input type="text" class="parcial-input" id="parcial-mat-input" placeholder="Ej: Matematica II">
+        </div>
+        <div class="field">
+          <label for="parcial-date-input">Fecha</label>
+          <input type="date" class="date-input" id="parcial-date-input">
+        </div>
+        <div class="field">
+          <label for="parcial-type-input">Tipo</label>
+          <input type="text" class="parcial-input" id="parcial-type-input" placeholder="1er parcial">
+        </div>
+        <button class="add-btn wide-add-btn" onclick="addParcial()"><i class="ti ti-plus"></i> Agregar</button>
+      </div>
+    </div>
+    <div id="parciales-list"></div>
+  </div>
+
+  <div class="view" id="view-pomodoro">
+    <div class="section-header">
+      <div class="section-title">
+        <i class="ti ti-clock-hour-4"></i>
+        Pomodoro
+      </div>
+    </div>
+    <div class="pomodoro-wrap draggable-card" data-dashboard-panel="pomodoro">
+      <div class="focus-config">
+        <div class="field">
+          <label for="pomo-target">Materia o actividad</label>
+          <select class="add-select" id="pomo-target" onchange="renderResourcesForSelectedTarget(); renderStudyNotes(); updateSelectedFocusColor();"></select>
+        </div>
+        <div class="field">
+          <label>Duracion</label>
+          <div class="duration-row">
+            <button class="duration-btn active" data-min="25" onclick="setPomoMode(25, 'focus')">25</button>
+            <button class="duration-btn" data-min="45" onclick="setPomoMode(45, 'focus')">45</button>
+            <button class="duration-btn" data-min="60" onclick="setPomoMode(60, 'focus')">60</button>
+            <input type="number" class="duration-manual" id="pomo-custom-min" min="1" max="180" placeholder="min" onchange="setCustomPomoMinutes()">
+          </div>
+        </div>
+      </div>
+      <div class="pomo-display" id="pomo-display">25:00</div>
+      <div class="pomo-progress" aria-hidden="true">
+        <div class="pomo-progress-fill" id="pomo-progress-fill"></div>
+      </div>
+      <div class="pomo-status" id="pomo-status">Listo para arrancar</div>
+      <div class="pomo-controls">
+        <button class="pomo-btn primary" id="pomo-start"><i class="ti ti-player-play"></i> Iniciar</button>
+        <button class="pomo-btn" id="pomo-reset"><i class="ti ti-refresh"></i></button>
+      </div>
+      <div class="pomo-stats">
+        <div class="pomo-stat">
+          <div class="pomo-stat-val" id="pomo-today">0</div>
+          <div class="pomo-stat-label">Hoy</div>
+        </div>
+        <div class="pomo-stat">
+          <div class="pomo-stat-val" id="pomo-week">0</div>
+          <div class="pomo-stat-label">Semana</div>
+        </div>
+        <div class="pomo-stat">
+          <div class="pomo-stat-val" id="pomo-total">0</div>
+          <div class="pomo-stat-label">Total</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="resource-panel">
+      <div class="panel-head">
+        <div class="panel-title"><i class="ti ti-link"></i> Material de estudio</div>
+      </div>
+      <div class="quick-add-grid" style="grid-template-columns:minmax(140px,1fr) minmax(140px,1fr) minmax(180px,1.4fr) auto;">
+        <div class="field">
+          <label for="resource-target">Materia</label>
+          <select class="add-select" id="resource-target"></select>
+        </div>
+        <div class="field">
+          <label for="resource-title">Título</label>
+          <input type="text" class="parcial-input" id="resource-title" placeholder="Drive, apunte, GoodNotes">
+        </div>
+        <div class="field">
+          <label for="resource-url">URL</label>
+          <input type="url" class="parcial-input" id="resource-url" placeholder="https://...">
+        </div>
+        <button class="add-btn wide-add-btn" onclick="addResource()"><i class="ti ti-plus"></i> Link</button>
+      </div>
+      <div class="resource-list" id="resource-list" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="notes-panel" style="margin-top:16px;">
+      <div class="panel-head">
+        <div class="panel-title"><i class="ph ph-note-pencil"></i> Toma de notas</div>
+      </div>
+      <div class="field">
+        <label for="study-note-input">Nota de estudio</label>
+        <textarea class="config-input study-note-input" id="study-note-input" placeholder="Escribí ideas, fórmulas, dudas o resumen mientras estudiás..."></textarea>
+      </div>
+      <button class="add-btn wide-add-btn" onclick="saveStudyNote()"><i class="ph ph-floppy-disk"></i> Guardar nota</button>
+      <div class="study-note-list" id="study-note-list"></div>
+    </div>
+
+    <div class="checklist-progress" style="margin-top:16px;">
+      <div class="progress-header">
+        <span class="progress-label">Checklist semanal</span>
+        <span class="progress-val" id="check-pct">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="check-fill" style="width:0%"></div></div>
+    </div>
+    <div class="checklist" id="checklist"></div>
+    <div style="display:flex; gap:6px; margin-top:10px;">
+      <input type="text" class="add-input" id="check-new-input" placeholder="Nuevo ítem del check semanal..." style="flex:1;">
+      <button class="add-btn" onclick="addChecklistItem()"><i class="ti ti-plus"></i></button>
+    </div>
+    <button class="btn-secondary" onclick="resetWeek()" style="margin-top:10px;">
+      <i class="ti ti-refresh"></i> Resetear check semanal
+    </button>
+  </div>
+
+  <div class="view" id="view-stats">
+    <div class="section-header">
+      <div class="section-title">
+        <i class="ti ti-chart-bar"></i>
+        Estadísticas
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">Tareas completadas por día</div>
+      <div class="bar-chart" id="bar-chart"></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">Mapa de actividad (últimas 4 sem.)</div>
+      <div class="heatmap" id="heatmap"></div>
+      <div class="heatmap-labels">
+        <span>Menos</span>
+        <span>Más</span>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">Resumen general</div>
+      <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;">
+        <div style="padding:12px; background:var(--bg-elev-2); border-radius:var(--radius-sm);">
+          <div style="font-family:var(--font-mono); font-size:20px; color:var(--accent); font-weight:600;" id="stats-total-done">0</div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Tareas completadas</div>
+        </div>
+        <div style="padding:12px; background:var(--bg-elev-2); border-radius:var(--radius-sm);">
+          <div style="font-family:var(--font-mono); font-size:20px; color:var(--info); font-weight:600;" id="stats-completion">0%</div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Tasa de éxito</div>
+        </div>
+        <div style="padding:12px; background:var(--bg-elev-2); border-radius:var(--radius-sm);">
+          <div style="font-family:var(--font-mono); font-size:20px; color:var(--warning); font-weight:600;" id="stats-pomo-hours">0h</div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Horas focus</div>
+        </div>
+        <div style="padding:12px; background:var(--bg-elev-2); border-radius:var(--radius-sm);">
+          <div style="font-family:var(--font-mono); font-size:20px; color:var(--purple); font-weight:600;" id="stats-best-day">?</div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Mejor día</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">Horas de focus por materia/actividad este mes</div>
+      <div class="entity-list" id="focus-by-target"></div>
+    </div>
+  </div>
+
+  <div class="view" id="view-gestion">
+    <div class="command-hero">
+      <div>
+        <div class="command-eyebrow">Centro de Comando</div>
+        <div class="command-title">Configura tu sistema</div>
+        <div class="command-copy">Empezá por acá: materias, horarios, actividades externas, personalización y mantenimiento de datos viven en este panel.</div>
+      </div>
+      <button class="add-btn wide-add-btn" onclick="openSubjectWizard()"><i class="ph ph-plus"></i> Materia rápida</button>
+    </div>
+
+    <div class="command-grid">
+      <button class="command-card" onclick="openSubjectWizard()">
+        <span class="command-icon"><i class="ph ph-graduation-cap"></i></span>
+        <span class="command-card-title">Nueva Materia</span>
+        <span class="command-card-copy">Cargá nombre, color, horarios, días recurrentes, parciales y entregas.</span>
+      </button>
+      <button class="command-card" onclick="focusActivityForm()">
+        <span class="command-icon"><i class="ph ph-briefcase"></i></span>
+        <span class="command-card-title">Nueva Actividad</span>
+        <span class="command-card-copy">Agregá pasantías, trabajo, gimnasio u otros bloques fijos de la semana.</span>
+      </button>
+      <button class="command-card" onclick="openAddEventFromGestion()">
+        <span class="command-icon"><i class="ph ph-calendar-plus"></i></span>
+        <span class="command-card-title">Nuevo Evento</span>
+        <span class="command-card-copy">Agregá un evento puntual a cualquier día del calendario.</span>
+      </button>
+      <button class="command-card" onclick="openModal('modal-settings')">
+        <span class="command-icon"><i class="ph ph-palette"></i></span>
+        <span class="command-card-title">Personalización Visual</span>
+        <span class="command-card-copy">Ajustá colores, exportaciones y notificaciones sin salir del planner.</span>
+      </button>
+      <button class="command-card danger" onclick="if(confirm('¿Borrar TODOS los datos? Esta acción no se puede deshacer.')) clearAll()">
+        <span class="command-icon"><i class="ph ph-trash"></i></span>
+        <span class="command-card-title">Borrar Datos</span>
+        <span class="command-card-copy">Limpia el planner local cuando quieras empezar de cero.</span>
+      </button>
+    </div>
+
+    <div class="manager-grid">
+      <div class="manager-panel">
+        <div class="panel-head">
+          <div class="panel-title"><i class="ti ti-school"></i> Materias</div>
+          <button class="add-btn wide-add-btn" onclick="openSubjectWizard()"><i class="ti ti-plus"></i> Materia</button>
+        </div>
+        <div class="entity-list" id="subjects-list"></div>
+      </div>
+
+      <div class="manager-panel">
+        <div class="panel-head">
+          <div class="panel-title"><i class="ti ti-briefcase"></i> Actividades externas</div>
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="activity-name">Nombre</label>
+            <input class="parcial-input" id="activity-name" placeholder="Pasantía, trabajo">
+          </div>
+          <div class="field">
+            <label for="activity-icon">Icono</label>
+            <input class="parcial-input" id="activity-icon" placeholder="💼">
+          </div>
+          <div class="field">
+            <label for="activity-color">Color</label>
+            <input type="color" class="color-input" id="activity-color" value="#58a6ff">
+          </div>
+          <div class="field">
+            <label for="activity-start">Inicio</label>
+            <input type="time" class="date-input" id="activity-start">
+          </div>
+          <div class="field">
+            <label for="activity-end">Fin</label>
+            <input type="time" class="date-input" id="activity-end">
+          </div>
+          <div class="field full">
+            <label>Días recurrentes</label>
+            <div class="weekday-picker" id="activity-days"></div>
+          </div>
+          <button class="add-btn wide-add-btn" id="activity-save-btn" onclick="saveActivity()"><i class="ti ti-device-floppy"></i> Guardar</button>
+        </div>
+        <div class="entity-list" id="activities-list" style="margin-top:14px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="view" id="view-networking">
+    <div class="section-header">
+      <div class="section-title">
+        <i class="ph ph-address-book"></i>
+        Networking
+      </div>
+    </div>
+    <div class="module-grid">
+      <div class="module-panel">
+        <div class="panel-head">
+          <div class="panel-title"><i class="ph ph-user-plus"></i> Nuevo contacto</div>
+        </div>
+        <div class="module-form">
+          <div class="field">
+            <label for="contact-name">Nombre</label>
+            <input class="parcial-input" id="contact-name" placeholder="Nombre completo">
+          </div>
+          <div class="field">
+            <label for="contact-role">Rol / Empresa</label>
+            <input class="parcial-input" id="contact-role" placeholder="Director, UTN, Endeavor">
+          </div>
+          <div class="field">
+            <label for="contact-link">Email / LinkedIn</label>
+            <input class="parcial-input" id="contact-link" placeholder="mail@dominio.com o linkedin.com/in/...">
+          </div>
+          <div class="field">
+            <label for="contact-phone">Teléfono</label>
+            <input class="parcial-input" id="contact-phone" placeholder="+54 11 1234-5678">
+          </div>
+          <div class="field">
+            <label for="contact-tag">Etiqueta</label>
+            <input class="parcial-input" id="contact-tag" placeholder="universidad, evento, datos">
+          </div>
+          <div class="field">
+            <label for="contact-notes">Notas</label>
+            <textarea class="config-input" id="contact-notes" placeholder="Contexto, próximos pasos..." style="min-height:96px;"></textarea>
+          </div>
+          <button class="add-btn wide-add-btn" onclick="saveContact()"><i class="ph ph-plus"></i> Contacto</button>
+        </div>
+      </div>
+      <div class="module-panel">
+        <div class="module-toolbar">
+          <input class="add-input" id="contact-filter" placeholder="Filtrar por empresa o etiqueta..." oninput="renderContacts()">
+        </div>
+        <div class="contact-grid" id="contacts-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="view" id="view-entreno">
+    <div class="section-header">
+      <div class="section-title">
+        <i class="ph ph-barbell"></i>
+        Entrenamiento y hábitos
+      </div>
+    </div>
+    <div class="module-grid">
+      <div class="module-panel">
+        <div class="panel-head">
+          <div class="panel-title"><i class="ph ph-check-square"></i> Hábitos diarios</div>
+        </div>
+        <div class="module-toolbar">
+          <input class="add-input" id="habit-name-input" placeholder="Nuevo hábito...">
+          <button class="add-btn" onclick="addHabit()"><i class="ph ph-plus"></i></button>
+        </div>
+        <div class="habit-list" id="habit-list"></div>
+      </div>
+      <div class="module-panel">
+        <div class="panel-head">
+          <div class="panel-title"><i class="ph ph-trend-up"></i> Progresión del ejercicio</div>
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="lift-date">Fecha</label>
+            <input type="date" class="date-input" id="lift-date">
+          </div>
+          <div class="field">
+            <label for="lift-exercise">Ejercicio</label>
+            <input class="parcial-input" id="lift-exercise" placeholder="Press de Banca">
+          </div>
+          <div class="field">
+            <label for="lift-kg">Kilos</label>
+            <input type="number" class="parcial-input" id="lift-kg" placeholder="120">
+          </div>
+          <div class="field">
+            <label for="lift-reps">Repeticiones</label>
+            <input type="number" class="parcial-input" id="lift-reps" placeholder="3">
+          </div>
+          <button class="add-btn wide-add-btn" onclick="addLift()"><i class="ph ph-plus"></i> Registro</button>
+        </div>
+        <div class="field" style="margin-top:14px;">
+          <label for="progression-exercise-select">Ejercicio a visualizar</label>
+          <select class="add-select" id="progression-exercise-select" onchange="renderProgressionChart()"></select>
+        </div>
+        <div class="chart-shell">
+          <canvas id="progressionChart"></canvas>
+        </div>
+        <div class="lift-list" id="lift-list" style="margin-top:14px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="view" id="view-proyectos">
+    <div class="section-header">
+      <div class="section-title">
+        <i class="ph ph-kanban"></i>
+        Proyectos
+      </div>
+    </div>
+    <div class="module-panel" style="margin-bottom:14px;">
+      <div class="quick-add-grid" style="grid-template-columns:minmax(180px,1fr) minmax(220px,1.6fr) minmax(140px,.8fr) auto;">
+        <div class="field">
+          <label for="kanban-title-input">Tarea</label>
+          <input class="parcial-input" id="kanban-title-input" placeholder="Nuevo proyecto o tarea">
+        </div>
+        <div class="field">
+          <label for="kanban-desc-input">Detalle</label>
+          <input class="parcial-input" id="kanban-desc-input" placeholder="Contexto breve">
+        </div>
+        <div class="field">
+          <label for="kanban-tag-input">Etiqueta</label>
+          <input class="parcial-input" id="kanban-tag-input" placeholder="demo, datos">
+        </div>
+        <button class="add-btn wide-add-btn" onclick="addKanbanCard()"><i class="ph ph-plus"></i> Tarjeta</button>
+      </div>
+    </div>
+    <div class="kanban-board">
+      <div class="kanban-column" data-kanban-status="todo">
+        <div class="kanban-column-header">
+          <div class="panel-title"><i class="ph ph-circle"></i> Por Hacer</div>
+          <span class="kanban-count" id="kanban-count-todo">0</span>
+        </div>
+        <div class="kanban-list" id="kanban-todo"></div>
+      </div>
+      <div class="kanban-column" data-kanban-status="doing">
+        <div class="kanban-column-header">
+          <div class="panel-title"><i class="ph ph-clock"></i> En Progreso</div>
+          <span class="kanban-count" id="kanban-count-doing">0</span>
+        </div>
+        <div class="kanban-list" id="kanban-doing"></div>
+      </div>
+      <div class="kanban-column" data-kanban-status="done">
+        <div class="kanban-column-header">
+          <div class="panel-title"><i class="ph ph-check-circle"></i> Terminado</div>
+          <span class="kanban-count" id="kanban-count-done">0</span>
+        </div>
+        <div class="kanban-list" id="kanban-done"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<button class="quick-fab" id="quick-fab" type="button" onclick="quickAddFromFab()" title="Agregar rápido" aria-label="Agregar rápido">
+  <i class="ph ph-plus"></i>
+</button>
+
+<aside class="sidebar">
+  <div class="sidebar-inner">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-title">Organización</div>
+      <div class="sidebar-brand-subtitle">Panel personal</div>
+    </div>
+    <button class="nav-item active" data-view="mes">
+      <i class="ph ph-calendar-dots"></i>
+      <span>mes</span>
+    </button>
+    <button class="nav-item" data-view="semana">
+      <i class="ph ph-calendar-check"></i>
+      <span>semana</span>
+    </button>
+    <button class="nav-item" data-view="pomodoro">
+      <i class="ph ph-timer"></i>
+      <span>focus</span>
+    </button>
+    <button class="nav-item" data-view="parciales">
+      <i class="ph ph-exam"></i>
+      <span>parciales</span>
+    </button>
+    <button class="nav-item" data-view="stats">
+      <i class="ph ph-chart-bar"></i>
+      <span>stats</span>
+    </button>
+    <button class="nav-item" data-view="networking">
+      <i class="ph ph-address-book"></i>
+      <span>network</span>
+    </button>
+    <button class="nav-item" data-view="entreno">
+      <i class="ph ph-barbell"></i>
+      <span>entreno</span>
+    </button>
+    <button class="nav-item" data-view="proyectos">
+      <i class="ph ph-kanban"></i>
+      <span>proyectos</span>
+    </button>
+    <button class="nav-item nav-management" data-view="gestion">
+      <i class="ph ph-sliders-horizontal"></i>
+      <span>gestión</span>
+    </button>
+    <button class="nav-item sidebar-help" id="btn-help" type="button" onclick="handleHelpRequest(event)" ontouchend="handleHelpRequest(event)">
+      <i class="ph ph-question"></i>
+      <span>Ayuda</span>
+    </button>
+  </div>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="modal-settings">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Ajustes</div>
+      <button class="modal-close" onclick="closeModal('modal-settings')" aria-label="Cerrar"><i class="ph ph-x"></i></button>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Notificaciones</div>
+      <div class="modal-row">
+        <span style="font-size:13px;">Recordatorios de parciales</span>
+        <div class="toggle" id="toggle-notify" onclick="toggleNotifications()"></div>
+      </div>
+      <div class="modal-row">
+        <span style="font-size:13px;">Alarma de pomodoro</span>
+        <div class="toggle on" id="toggle-pomo-sound" onclick="toggleSetting(this, 'pomoSound')"></div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Personalización Visual</div>
+      <div style="font-size:12px; color:var(--text-dim); margin-bottom:10px; line-height:1.5;">
+        Cambiá los colores principales en tiempo real. La preferencia queda guardada en este navegador.
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label for="theme-bg-input">Color de fondo principal</label>
+          <input type="color" class="color-input" id="theme-bg-input" value="#111111" oninput="updateThemeColor('bg', this.value)">
+        </div>
+        <div class="field">
+          <label for="theme-accent-input">Color de acento</label>
+          <input type="color" class="color-input" id="theme-accent-input" value="#10B981" oninput="updateThemeColor('accent', this.value)">
+        </div>
+      </div>
+      <button class="btn-secondary" onclick="resetVisualTheme()">
+        <i class="ph ph-arrow-counter-clockwise"></i> Restaurar colores
+      </button>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Google Calendar</div>
+      <div style="font-size:12px; color:var(--text-dim); margin-bottom:10px; line-height:1.5;" id="calendar-status">
+        Conectá tu calendario para ver tus eventos dentro del planner.
+      </div>
+      <button class="btn-primary" id="calendar-connect-btn" onclick="connectGoogleCalendar()">
+        <i class="ph ph-calendar-plus"></i> Conectar Google Calendar
+      </button>
+      <button class="btn-secondary" id="calendar-sync-btn" onclick="syncGoogleCalendarEvents(true)">
+        <i class="ph ph-arrows-clockwise"></i> Sincronizar eventos
+      </button>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Datos</div>
+      <button class="btn-secondary" onclick="exportData()">
+        <i class="ti ti-download"></i> Exportar JSON
+      </button>
+      <button class="btn-secondary" onclick="exportCsv()">
+        <i class="ti ti-file-spreadsheet"></i> Exportar CSV
+      </button>
+      <button class="btn-secondary" onclick="document.getElementById('import-file').click()">
+        <i class="ti ti-upload"></i> Importar JSON
+      </button>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+      <button class="btn-secondary" onclick="if(confirm('¿Borrar TODOS los datos? Esta acción no se puede deshacer.')) clearAll()" style="color:var(--danger); border-color:var(--danger);">
+        <i class="ph ph-trash"></i> Borrar todo
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-day-agenda">
+  <div class="modal" style="max-width:920px;">
+    <div class="modal-header">
+      <div class="modal-title" id="day-agenda-title">Agenda del Día</div>
+      <button class="modal-close" onclick="closeModal('modal-day-agenda')" aria-label="Cerrar"><i class="ph ph-x"></i></button>
+    </div>
+    <div id="day-agenda-content"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-add-event">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="add-event-modal-title">Nuevo evento</div>
+      <button class="modal-close" onclick="closeModal('modal-add-event')" aria-label="Cerrar"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="form-grid">
+      <div class="field" id="add-event-date-field">
+        <label for="add-event-date">Fecha</label>
+        <input type="date" class="parcial-input" id="add-event-date">
+      </div>
+      <div class="field" id="add-event-title-field">
+        <label for="add-event-title">Título</label>
+        <input class="parcial-input" id="add-event-title" placeholder="Ej: Reunión de equipo">
+      </div>
+      <div class="field">
+        <label for="add-event-start">Hora inicio</label>
+        <input type="time" class="parcial-input" id="add-event-start">
+      </div>
+      <div class="field">
+        <label for="add-event-end">Hora fin</label>
+        <input type="time" class="parcial-input" id="add-event-end">
+      </div>
+      <div class="field">
+        <label for="add-event-color">Color (opcional)</label>
+        <input type="color" class="color-input" id="add-event-color" value="#60a5fa">
+      </div>
+      <div class="field" style="align-items:end;">
+        <button class="btn-primary" onclick="saveQuickEvent()"><i class="ph ph-plus"></i> Agregar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-calendar-optin">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Conectar Google Calendar</div>
+      <button class="modal-close" onclick="dismissCalendarPrompt()" aria-label="Cerrar"><i class="ph ph-x"></i></button>
+    </div>
+    <div style="font-size:13px; color:var(--text-dim); line-height:1.6;">
+      ¿Querés traer tus eventos de Google Calendar al calendario mensual? Solo se solicita permiso de lectura.
+    </div>
+    <button class="btn-primary" onclick="closeModal('modal-calendar-optin'); connectGoogleCalendar();">
+      <i class="ph ph-calendar-plus"></i> Conectar Calendar
+    </button>
+    <button class="btn-secondary" onclick="dismissCalendarPrompt()">
+      Ahora no
+    </button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-desktop-tip">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Tip para tenerlo a mano</div>
+      <button class="modal-close" onclick="closeModal('modal-desktop-tip')" aria-label="Cerrar"><i class="ph ph-x"></i></button>
+    </div>
+    <div style="font-size:13px; color:var(--text-dim); line-height:1.6;">
+      ¡Tip! Para no perder este planner, haz clic derecho en el archivo <strong style="color:var(--text);">Organización.html</strong> en tu carpeta, elige <strong style="color:var(--accent);">Enviar a → Escritorio (acceso directo)</strong> y tenlo siempre a mano.
+    </div>
+    <button class="btn-primary" onclick="closeModal('modal-desktop-tip')">
+      <i class="ti ti-check"></i> Entendido
+    </button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-contact-edit">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Editar contacto</div>
+      <button class="modal-close" onclick="closeModal('modal-contact-edit')" aria-label="Cerrar"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="form-grid">
+      <input type="hidden" id="contact-edit-id">
+      <div class="field">
+        <label for="contact-edit-name">Nombre</label>
+        <input class="parcial-input" id="contact-edit-name">
+      </div>
+      <div class="field">
+        <label for="contact-edit-role">Rol / Empresa</label>
+        <input class="parcial-input" id="contact-edit-role">
+      </div>
+      <div class="field">
+        <label for="contact-edit-link">Email / LinkedIn</label>
+        <input class="parcial-input" id="contact-edit-link">
+      </div>
+      <div class="field">
+        <label for="contact-edit-phone">Teléfono</label>
+        <input class="parcial-input" id="contact-edit-phone">
+      </div>
+      <div class="field">
+        <label for="contact-edit-tag">Etiqueta</label>
+        <input class="parcial-input" id="contact-edit-tag">
+      </div>
+      <div class="field full">
+        <label for="contact-edit-notes">Notas</label>
+        <textarea class="config-input" id="contact-edit-notes" style="min-height:96px;"></textarea>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="saveEditContact()">
+      <i class="ti ti-device-floppy"></i> Guardar cambios
+    </button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-subject">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="subject-modal-title">Nueva materia</div>
+      <button class="modal-close" onclick="closeModal('modal-subject')" aria-label="Cerrar"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="form-grid">
+      <input type="hidden" id="subject-edit-id">
+      <div class="field">
+        <label for="subject-name">Materia</label>
+        <input class="parcial-input" id="subject-name" placeholder="Investigacion Operativa">
+      </div>
+      <div class="field">
+        <label for="subject-icon">Icono</label>
+        <input class="parcial-input" id="subject-icon" placeholder="💼">
+      </div>
+      <div class="field">
+        <label for="subject-color">Color</label>
+        <input type="color" class="color-input" id="subject-color" value="#00d97e">
+      </div>
+      <div class="field full">
+        <label>Días y horarios recurrentes</label>
+        <div class="weekday-picker" id="subject-days"></div>
+        <div class="day-schedule-list" id="subject-day-schedules"></div>
+      </div>
+      <div class="field">
+        <label for="subject-partial-count">Cuantos parciales tiene?</label>
+        <input type="number" class="parcial-input" id="subject-partial-count" min="0" max="12" value="0" onchange="renderSubjectDateFields()">
+      </div>
+      <div class="field full" id="subject-partial-dates"></div>
+      <div class="field full">
+        <label for="subject-delivery-dates">Fechas de entregas importantes</label>
+        <textarea class="config-input" id="subject-delivery-dates" placeholder="Una fecha por linea: 2026-06-13 | Entrega TP" style="min-height:92px;"></textarea>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="saveSubjectWizard()">
+      <i class="ti ti-device-floppy"></i> Guardar materia
+    </button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDqLn9RixizdjtWjwu68PD1AyYF2tcVrmk",
+  authDomain: "organizacionbybenja.firebaseapp.com",
+  projectId: "organizacionbybenja",
+  storageBucket: "organizacionbybenja.firebasestorage.app",
+  messagingSenderId: "859282162452",
+  appId: "1:859282162452:web:2b966f8b6207f8e5337801",
+  measurementId: "G-7Z1W8G9M8G"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ prompt: 'select_account' });
+setPersistence(auth, browserLocalPersistence).catch(console.error);
+
+window.googleAccountPlanner = {
+  auth,
+  provider,
+  db: getFirestore(app),
+  doc,
+  getDoc,
+  setDoc,
+  onSnapshot,
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
+  signOut,
+  onAuthStateChanged,
+  serverTimestamp,
+};
+window.dispatchEvent(new Event('google-account-ready'));
+</script>
+
+
+<script src="js/state.js"></script>
+<script src="js/firebase.js"></script>
+<script src="js/mes.js"></script>
+<script src="js/semana.js"></script>
+<script src="js/tareas.js"></script>
+<script src="js/parciales.js"></script>
+<script src="js/gestion.js"></script>
+<script src="js/checklist.js"></script>
+<script src="js/networking.js"></script>
+<script src="js/entreno.js"></script>
+<script src="js/pomodoro.js"></script>
+<script src="js/stats.js"></script>
+<script src="js/proyectos.js"></script>
+<script src="js/tour.js"></script>
+<script src="js/notifications.js"></script>
+<script src="js/calendar.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/drag.js"></script>
+<script src="js/data.js"></script>
+<script src="js/longpress.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

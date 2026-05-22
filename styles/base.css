@@ -1,0 +1,125 @@
+:root {
+  --bg-principal: #111111;
+  --bg-sidebar: rgba(13, 13, 13, 0.92);
+  --bg-header: rgba(17, 17, 17, 0.78);
+  --bg-tarjetas: #181818;
+  --bg-tarjetas-hover: #202020;
+  --bg-campos: #161616;
+  --bg-superficie: #242424;
+  --bg-glass: rgba(24, 24, 24, 0.72);
+  --color-borde: rgba(255, 255, 255, 0.075);
+  --color-borde-fuerte: rgba(255, 255, 255, 0.14);
+  --color-texto: #f4f4f5;
+  --color-texto-secundario: #b4b4bb;
+  --color-texto-suave: #6f6f78;
+  --color-acento: #10B981;
+  --color-acento-suave: rgba(16, 185, 129, 0.13);
+  --color-acento-brillo: rgba(16, 185, 129, 0.36);
+  --color-acento-cian: #22d3ee;
+  --color-peligro: #f43f5e;
+  --color-peligro-suave: rgba(244, 63, 94, 0.13);
+  --color-alerta: #f59e0b;
+  --color-alerta-suave: rgba(245, 158, 11, 0.14);
+  --color-info: #38bdf8;
+  --color-info-suave: rgba(56, 189, 248, 0.13);
+  --color-violeta: #a78bfa;
+  --color-violeta-suave: rgba(167, 139, 250, 0.13);
+  --color-rosa: #fb7185;
+  --color-rosa-suave: rgba(251, 113, 133, 0.13);
+  --sidebar-ancho: 236px;
+  --header-alto: 72px;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-lg: 18px;
+  --shadow: 0 18px 50px rgba(0,0,0,0.34);
+  --shadow-glow: 0 0 0 1px var(--border), 0 18px 40px rgba(16,185,129,0.08);
+  --transicion-ui: all 0.3s ease;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  --bg: var(--bg-principal);
+  --bg-elev: var(--bg-tarjetas);
+  --bg-elev-2: var(--bg-tarjetas-hover);
+  --bg-elev-3: var(--bg-superficie);
+  --border: var(--color-borde);
+  --border-strong: var(--color-borde-fuerte);
+  --text: var(--color-texto);
+  --text-dim: var(--color-texto-secundario);
+  --text-muted: var(--color-texto-suave);
+  --accent: var(--color-acento);
+  --accent-dim: var(--color-acento-suave);
+  --accent-glow: var(--color-acento-brillo);
+  --danger: var(--color-peligro);
+  --danger-dim: var(--color-peligro-suave);
+  --warning: var(--color-alerta);
+  --warning-dim: var(--color-alerta-suave);
+  --info: var(--color-info);
+  --info-dim: var(--color-info-suave);
+  --purple: var(--color-violeta);
+  --purple-dim: var(--color-violeta-suave);
+  --pink: var(--color-rosa);
+  --pink-dim: var(--color-rosa-suave);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { font-size: 15px; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
+  padding: 0 0 0 var(--sidebar-ancho);
+  background-image:
+    radial-gradient(circle at 18% 0%, rgba(16,185,129,0.075) 0%, transparent 36%),
+    radial-gradient(circle at 88% 100%, rgba(34,211,238,0.045) 0%, transparent 44%),
+    linear-gradient(180deg, #111111 0%, #0f0f10 100%);
+  background-attachment: fixed;
+}
+::selection { background: var(--accent); color: var(--bg); }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+
+input, button, select, textarea { font-family: inherit; color: inherit; }
+button { cursor: pointer; border: none; background: none; }
+button, input, select, textarea, a, .nav-item, .icon-btn, .day, .task, .parcial-card, .add-btn, .stat-card {
+  transition: var(--transicion-ui);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.85); }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-left: 0;
+    padding-bottom: calc(86px + var(--safe-bottom));
+  }
+}
+
+@media (max-width: 480px) {
+  body { padding-left: 0; padding-bottom: calc(92px + var(--safe-bottom)); }
+}
+
+@media (max-width: 360px) {
+  html { font-size: 14px; }
+}
